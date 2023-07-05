@@ -330,4 +330,4 @@ mini_proxy = (
 
 cq.exporters.export(hexagon_cut, "./stl/dome_hexagon_cut.stl")
 cq.exporters.export(pentagon_cut, "./stl/dome_pentagon_cut.stl")
-cq.exporters.export(scene2, "./stl/dome.stl")
+cq.exporters.export(scene2, "./stl/dome_v1.stl")
