@@ -4,6 +4,7 @@
 
 ## 0.0.4
 * overhauling how greebles are added to the dome.
+* Each panel is now independently addressable and can have it's own greeble assigned to it.
 
 ## 0.0.3 
 * Updated Dependencies

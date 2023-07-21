@@ -126,13 +126,7 @@ class Dome(Base):
         super().build()
         dome = self.build_frame()
         greebled_r1 = None
-
-        #if self.render_cut_keys:
-        #    dome = (
-        #        dome
-        #        .union(self.hexagon_cut_key_bp.build())
-        #        .union(self.pentagon_cut_key_bp.build().translate((43,0,0)))
-        #    )
+        greebled_r2 = None
 
         #greebles
 
@@ -149,18 +143,25 @@ class Dome(Base):
             if len(self.greebles_bp) > 1:
                 hexes_bp = self.greebles_bp[1:6]
 
-                greebled_r1 = self.__build_ring1_list(
-                    hexes_bp,
-                    center_pentagon
-                )
+            greebled_r1 = self.__build_ring1_list(
+                hexes_bp,
+                center_pentagon
+            )
             
+        pentagons_bp = None
+        hexagons_bp = None
+        if len(self.greebles_bp) > 6:
+            pentagons_bp = self.greebles_bp[6::2]
 
-        #if self.vent_bp:
-        #    greebled_r1 = self.__build_ring1(
-        #        self.vent_bp.build(),
-        #        None,
-        #        keep_hex = self.r1_greeble
-        #    )
+        if len(self.greebles_bp) > 6:
+            hexagons_bp = self.greebles_bp[7::2]
+
+        if pentagons_bp or hexagons_bp:
+            print(f'pentagons_bp {pentagons_bp}, hexagons_bp {hexagons_bp}')
+            greebled_r2 = self.__build_ring2_list(
+                hexagons_bp,
+                pentagons_bp,
+            )
 
         #if self.door_bp:
         #    greebled_r2 = self.__build_ring2(
@@ -168,10 +169,13 @@ class Dome(Base):
         #        None,
         #        keep_hex = self.r2_greeble_hex
         #    )
+
+
         if greebled_r1:
-            dome = (dome.add(greebled_r1.translate((0,0,60)))
-            #    .add(greebled_r2.translate((0,0,60)))
-            )
+            dome = dome.add(greebled_r1.translate((0,0,60)))
+
+        if greebled_r2:
+            dome = dome.add(greebled_r2.translate((0,0,60)))
 
         return dome
 
@@ -317,7 +321,7 @@ class Dome(Base):
 
         return dome
 
-    def __build_ring1_list(self, hex_List, pen_shape):
+    def __build_ring1_list(self, hex_list, pen_shape):
         dome = (
             cq.Workplane("XY")
         )
@@ -331,10 +335,10 @@ class Dome(Base):
             )
 
         #ring 1
-        if hex_List:
+        if hex_list:
             for i in range(5):
                 try:
-                    node = hex_List[i]
+                    node = hex_list[i]
                     if node:
                         h = node.build()
                         h =  _rotate(h,self.r1_x_rotate,0)
@@ -381,6 +385,50 @@ class Dome(Base):
                             .rotate((0,0,1),(0,0,0),72*i)
                         )
                     )
+
+        return ring
+
+    def __build_ring2_list(self, hex_list, pen_list):
+        r2_p_y = 65.6
+        ring = (
+            cq.Workplane("XY")
+        )
+
+        if hex_list:
+            for i in range(5):
+                try:
+                    node = hex_list[i]
+                    if node:
+                        h = node.build()
+                        h = _rotate(h,self.r2_x_rotate,self.r2_z_rotate)
+                        ring = (
+                            ring
+                            .union(
+                                h
+                                .translate((0,-61.5,-23))
+                                .rotate((0,0,1),(0,0,0),(72*i)+72*2)
+                            )
+                        )
+                except IndexError:
+                    print("Index doesn't exist!")
+
+        if pen_list:
+            for i in range(5):
+                try:
+                    node = pen_list[i]
+                    if node:
+                        p = node.build()
+                        p =  _rotate(p,self.r2_pen_x_rotate,self.r2_pen_z_rotate)
+                        ring = (
+                            ring
+                            .union(
+                                p
+                                .translate((0,r2_p_y,-28.3))
+                                .rotate((0,0,1),(0,0,0),(72*i)-72*1)
+                            )
+                        )
+                except IndexError:
+                    print("Index doesn't exist!")
 
         return ring
 
