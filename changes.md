@@ -2,6 +2,9 @@
 
 ## Main wip
 
+## 0.0.4
+* overhauling how greebles are added to the dome.
+
 ## 0.0.3 
 * Updated Dependencies
 * Added BaseHexagon
@@ -9,6 +12,7 @@
 * Refactored vent_hexagon to VentHexagon
 * Cleaned up imports
 * Added door.py example
+* cleaned up when subcomponents are built
 
 ## 0.0.2
 * Refactored Dome code to version 2

@@ -3,7 +3,6 @@ from . import BaseHexagon, make_hexagon
 
 class CutKeyHexagon(BaseHexagon):
     def __init__(self):
-        print('CutKeyHexagon __init__')
         super().__init__()
         self.radius = 58
         self.height = 2
@@ -20,9 +19,19 @@ class CutKeyHexagon(BaseHexagon):
 
         self.cut_key = None
 
-    def make(self):
-        super().make()
-        cut_key = make_hexagon(self.radius, self.height, 0)
+    def _calc_radius(self):
+        radius = self.radius
+
+        if self.parent and hasattr(self.parent, "hex_radius") and hasattr(self.parent, "hex_radius_cut"):
+            radius = self.parent.hex_radius - self.parent.hex_radius_cut
+        return radius
+
+    def make(self, parent=None):
+        super().make(parent)
+
+        radius = self._calc_radius()
+
+        cut_key = make_hexagon(radius, self.height, 0)
 
         logo_text = (
             cq.Workplane("XY")

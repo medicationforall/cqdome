@@ -12,7 +12,7 @@ class DoorHexagon(BaseHexagon):
         self.radius = 58
         self.height = 4
 
-        self.frame_inset = 9
+        self.frame_inset = 4
 
         # door
         self.door_padding = .5
@@ -25,7 +25,7 @@ class DoorHexagon(BaseHexagon):
         self.hinge_height = 5
         self.hinge_cylinder_height = 20
         self.hinge_cylinder_radius = 2.5
-        self.hinge_x_translate= -3.5
+        self.hinge_x_translate= -4.3 #-3.5
 
         # handle
         self.handle_x_translate = 8.5
@@ -42,11 +42,22 @@ class DoorHexagon(BaseHexagon):
         self.handle_detail = None
 
 
-    def make(self):
-        super().make()
-        cut_radius = self.radius - self.frame_inset
-        self.hexagon = make_hexagon(self.radius, self.height)
-        self.hexagon_cut = make_hexagon(cut_radius, self.height)
+    def _calc_radius(self):
+        radius = self.radius
+
+        if self.parent and hasattr(self.parent, "hex_radius") and hasattr(self.parent, "hex_radius_cut"):
+            radius = self.parent.hex_radius - self.parent.hex_radius_cut
+            print(f'door _calc_radius set calculated radius {radius}, {self.parent.hex_radius}, {self.parent.hex_radius_cut}')
+        return radius
+
+    def make(self,parent=None):
+        super().make(parent)
+
+        radius = self._calc_radius()
+        cut_radius = radius - self.frame_inset
+
+        self.hexagon = make_hexagon(radius, self.height, 30)
+        self.hexagon_cut = make_hexagon(cut_radius, self.height, 30)
         self.__make_frame()
         self.__make_door_body()
         self.__make_hinge()
@@ -62,10 +73,11 @@ class DoorHexagon(BaseHexagon):
 
 
     def __make_door_body(self):
+        radius = self._calc_radius()
         _check_chamfer(self.door_height/2, self.door_chamfer)
-        door_radius = self.radius - (self.frame_inset - self.door_padding)
+        door_radius = radius - (self.frame_inset - self.door_padding)
         door = (
-            make_hexagon(door_radius, self.door_height)
+            make_hexagon(door_radius, self.door_height, 30)
             .chamfer(self.door_chamfer)
         )
 
@@ -113,7 +125,8 @@ class DoorHexagon(BaseHexagon):
 
     def build(self):
         super().build()
-        cut_radius = self.radius - self.frame_inset
+        radius = self._calc_radius()
+        cut_radius = radius - self.frame_inset
         assembly = (
             cq.Workplane("XY")
             .union(self.frame.translate((0,0,0)))
@@ -125,4 +138,4 @@ class DoorHexagon(BaseHexagon):
             .cut(self.handle_outline.translate(((cut_radius/2) - self.handle_x_translate,0,0)))
             .union(self.handle_detail.translate(((cut_radius/2) - self.handle_x_translate,0,0)))
         )
-        return assembly
+        return assembly.rotate((0,0,1),(0,0,0), -30)

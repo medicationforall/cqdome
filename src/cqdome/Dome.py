@@ -37,8 +37,13 @@ class Dome(Base):
         self.r3_z_rotate = 30
 
         # greebles
+        self.greebles_bp = []
         self.r1_greeble = [1]
         self.r2_greeble_hex = [0,2]
+
+        # door
+        #self.door_frame_inset = 4
+        #self.door_hinge_x_translate = -4.3
 
         # render flags
         self.render_cut_keys = True
@@ -57,29 +62,34 @@ class Dome(Base):
         self.box_cut = None
 
 
-    def make(self):
-        super().make()
+    def make(self, parent=None):
+        super().make(parent)
         self.__make_base_shapes()
         self.box_cut = cq.Workplane("XY").box(153,160,150)
 
-        if self.render_cut_keys:
-            self.__make_hexagon_cut_key()
-            self.__make_pentagon_cut_key()
+        #if self.render_cut_keys:
+            #self.__make_hexagon_cut_key()
+            #self.__make_pentagon_cut_key()
 
         #make and assign
-        vent_bp = greeble.VentHexagon()
-        vent_bp.radius = self.hex_radius - self.hex_radius_cut
-        vent_bp.make()
-        self.vent_bp = vent_bp
+        #vent_bp = greeble.VentHexagon()
+        #vent_bp.radius = self.hex_radius - self.hex_radius_cut
+        #vent_bp.make()
+        #self.vent_bp = vent_bp
 
         #make and assign
-        door_bp = greeble.DoorHexagon()
-        door_bp.radius = self.hex_radius - self.hex_radius_cut
-        door_bp.frame_inset = 4
-        door_bp.hinge_x_translate = -4.3
-        door_bp.make()
+        #door_bp = greeble.DoorHexagon()
+        #door_bp.radius = self.hex_radius - self.hex_radius_cut
+        #door_bp.frame_inset = 4
+        #door_bp.hinge_x_translate = -4.3
+        #door_bp.make()
+        #self.door_bp = door_bp
 
-        self.door_bp = door_bp
+        for bp in self.greebles_bp:
+            if bp and bp.make:
+                bp.make(self)
+
+        
 
 
     def __make_base_shapes(self):
@@ -115,34 +125,53 @@ class Dome(Base):
     def build(self):
         super().build()
         dome = self.build_frame()
+        greebled_r1 = None
 
-        if self.render_cut_keys:
-            dome = (
-                dome
-                .union(self.hexagon_cut_key_bp.build())
-                .union(self.pentagon_cut_key_bp.build().translate((43,0,0)))
-            )
+        #if self.render_cut_keys:
+        #    dome = (
+        #        dome
+        #        .union(self.hexagon_cut_key_bp.build())
+        #        .union(self.pentagon_cut_key_bp.build().translate((43,0,0)))
+        #    )
 
         #greebles
-        if self.vent_bp:
-            greebled_r1 = self.__build_ring1(
-                self.vent_bp.build(),
-                None,
-                keep_hex = self.r1_greeble
-            )
 
-        if self.door_bp:
-            greebled_r2 = self.__build_ring2(
-                self.door_bp.build().rotate((0,0,1),(0,0,0),-30),
-                None,
-                keep_hex = self.r2_greeble_hex
-            )
+        ## center greeble
+        print(self.greebles_bp)
+        if self.greebles_bp and len(self.greebles_bp) > 0:
 
-        dome = (
-            dome
-            .add(greebled_r1.translate((0,0,60)))
-            .add(greebled_r2.translate((0,0,60)))
-        )
+            center_bp = None
+            hexes_bp = None
+            center_pentagon = None
+            if self.greebles_bp[0] and self.greebles_bp[0].build:
+                center_pentagon = self.greebles_bp[0].build()
+
+            if len(self.greebles_bp) > 1:
+                hexes_bp = self.greebles_bp[1:6]
+
+                greebled_r1 = self.__build_ring1_list(
+                    hexes_bp,
+                    center_pentagon
+                )
+            
+
+        #if self.vent_bp:
+        #    greebled_r1 = self.__build_ring1(
+        #        self.vent_bp.build(),
+        #        None,
+        #        keep_hex = self.r1_greeble
+        #    )
+
+        #if self.door_bp:
+        #    greebled_r2 = self.__build_ring2(
+        #        self.door_bp.build().rotate((0,0,1),(0,0,0),-30),
+        #        None,
+        #        keep_hex = self.r2_greeble_hex
+        #    )
+        if greebled_r1:
+            dome = (dome.add(greebled_r1.translate((0,0,60)))
+            #    .add(greebled_r2.translate((0,0,60)))
+            )
 
         return dome
 
@@ -286,6 +315,39 @@ class Dome(Base):
                         )
                     )
 
+        return dome
+
+    def __build_ring1_list(self, hex_List, pen_shape):
+        dome = (
+            cq.Workplane("XY")
+        )
+
+        #center
+        if pen_shape:
+            dome = dome.union(
+                pen_shape
+                .translate((0,0,12.2))
+                .rotate((0,0,1),(0,0,0),18)
+            )
+
+        #ring 1
+        if hex_List:
+            for i in range(5):
+                try:
+                    node = hex_List[i]
+                    if node:
+                        h = node.build()
+                        h =  _rotate(h,self.r1_x_rotate,0)
+                        dome = (
+                            dome
+                            .union(
+                                h
+                                .translate((0,38.5,0))
+                                .rotate((0,0,1),(0,0,0), 72*i)
+                            )
+                        )
+                except IndexError:
+                    print("Index doesn't exist!")
         return dome
 
 

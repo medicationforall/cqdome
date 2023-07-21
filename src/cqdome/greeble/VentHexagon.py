@@ -38,10 +38,20 @@ class VentHexagon(BaseHexagon):
             size = vent_size
         )
 
-    def make(self):
-        super().make()
-        self.hexagon = make_hexagon(self.radius, self.height, 0)
-        self.hexagon_cut = make_hexagon(self.radius - self.frame_size, self.height, 0)
+    def _calc_radius(self):
+        radius = self.radius
+
+        if self.parent and hasattr(self.parent, "hex_radius") and hasattr(self.parent, "hex_radius_cut"):
+            radius = self.parent.hex_radius - self.parent.hex_radius_cut
+        return radius
+
+    def make(self,parent=None):
+        super().make(parent)
+
+        radius = self._calc_radius()
+
+        self.hexagon = make_hexagon(radius, self.height, 0)
+        self.hexagon_cut = make_hexagon(radius - self.frame_size, self.height, 0)
         self.__make_vents()
 
 
