@@ -1,24 +1,12 @@
 import cadquery as cq
-from cqdome import Base
-
-def _make_hexagon(radius, height, z_rotate = 30):
-    hexagon = (
-        cq.Workplane("XY")
-        .polygon(6, radius)
-        .extrude(height)
-        .translate((0,0,-1 * (height/2)))
-        .rotate((0,0,1), (0,0,0), z_rotate)
-        #.rotate((1,0,0),(0,0,0),-58)
-    )
-    return hexagon
+from . import BaseHexagon, make_hexagon
 
 def _check_chamfer(height, chamfer):
     if not (chamfer < height):
         raise Exception(f"chamfer \"{chamfer}\" greater than or equal to height provided \"{height}\"")
 
 
-
-class DoorHexagon(Base):
+class DoorHexagon(BaseHexagon):
     def __init__(self):
         super().__init__()
         self.radius = 58
@@ -57,8 +45,8 @@ class DoorHexagon(Base):
     def make(self):
         super().make()
         cut_radius = self.radius - self.frame_inset
-        self.hexagon = _make_hexagon(self.radius, self.height)
-        self.hexagon_cut = _make_hexagon(cut_radius, self.height)
+        self.hexagon = make_hexagon(self.radius, self.height)
+        self.hexagon_cut = make_hexagon(cut_radius, self.height)
         self.__make_frame()
         self.__make_door_body()
         self.__make_hinge()
@@ -77,7 +65,7 @@ class DoorHexagon(Base):
         _check_chamfer(self.door_height/2, self.door_chamfer)
         door_radius = self.radius - (self.frame_inset - self.door_padding)
         door = (
-            _make_hexagon(door_radius, self.door_height)
+            make_hexagon(door_radius, self.door_height)
             .chamfer(self.door_chamfer)
         )
 

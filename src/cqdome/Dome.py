@@ -1,5 +1,5 @@
 import cadquery as cq
-from cqdome import Base, greeble
+from . import Base, greeble
 
 def _make_pentagon(pen_radius, hex_height):
     pentagon = (
@@ -83,9 +83,15 @@ class Dome(Base):
             self.__make_hexagon_cut_key()
             self.__make_pentagon_cut_key()
 
-        self.vent_greeble = greeble.vent_hexagon(
-            radius = self.hex_radius - self.hex_radius_cut
-        )
+        #self.vent_greeble = greeble.vent_hexagon(
+        #    radius = self.hex_radius - self.hex_radius_cut
+        #)
+
+        vent_bp = greeble.VentHexagon()
+        vent_bp.radius = self.hex_radius - self.hex_radius_cut
+        #vent_bp.frame_inset = 4
+        vent_bp.make()
+        self.vent_greeble = vent_bp.build()
 
         door_bp = greeble.DoorHexagon()
         door_bp.radius = self.hex_radius - self.hex_radius_cut
