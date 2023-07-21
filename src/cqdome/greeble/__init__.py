@@ -4,5 +4,5 @@ from .DoorHexagon import DoorHexagon
 from .VentHexagon import VentHexagon
 
 
-#from .CutKeyHexagon import CutKeyHexagon
-#from .CutKeyPentagon import CutKeyPentagon
+from .CutKeyHexagon import CutKeyHexagon
+from .CutKeyPentagon import CutKeyPentagon

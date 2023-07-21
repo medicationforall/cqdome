@@ -1,24 +1,6 @@
 import cadquery as cq
 from . import Base, greeble
-
-def _make_pentagon(pen_radius, hex_height):
-    pentagon = (
-        cq.Workplane("XY")
-        .polygon(5, pen_radius)
-        .extrude(hex_height)
-        .translate((0,0,-1*(hex_height/2)))
-
-    )
-    return pentagon
-
-def _make_hexagon(hex_radius, hex_height):
-    hexagon = (
-        cq.Workplane("XY")
-        .polygon(6, hex_radius)
-        .extrude(hex_height)
-        .translate((0,0,-1*(hex_height/2)))
-    )
-    return hexagon
+from .greeble import make_hexagon, make_pentagon
 
 def _rotate(shape, x_rotate=0, z_rotate=0):
     if shape:
@@ -61,17 +43,18 @@ class Dome(Base):
         # render flags
         self.render_cut_keys = True
 
+        # Blueprints
+        self.hexagon_cut_key_bp = None
+        self.pentagon_cut_key_bp = None
+        self.door_bp = None
+        self.vent_bp = None
+
         #--- shapes
         self.pentagon = None
         self.pentagon_cut = None
         self.hexagon = None
         self.hexagon_cut = None
         self.box_cut = None
-
-        self.hexagon_cut_key = None
-        self.pentagon_cut_key = None
-        self.vent_greeble = None
-        self.door_greeble = None
 
 
     def make(self):
@@ -83,82 +66,51 @@ class Dome(Base):
             self.__make_hexagon_cut_key()
             self.__make_pentagon_cut_key()
 
-        #self.vent_greeble = greeble.vent_hexagon(
-        #    radius = self.hex_radius - self.hex_radius_cut
-        #)
-
+        #make and assign
         vent_bp = greeble.VentHexagon()
         vent_bp.radius = self.hex_radius - self.hex_radius_cut
-        #vent_bp.frame_inset = 4
         vent_bp.make()
-        self.vent_greeble = vent_bp.build()
+        self.vent_bp = vent_bp
 
+        #make and assign
         door_bp = greeble.DoorHexagon()
         door_bp.radius = self.hex_radius - self.hex_radius_cut
         door_bp.frame_inset = 4
         door_bp.hinge_x_translate = -4.3
         door_bp.make()
 
-        self.door_greeble = door_bp.build()
+        self.door_bp = door_bp
 
 
     def __make_base_shapes(self):
-        self.pentagon = _make_pentagon(self.pen_radius, self.hex_height)
-        self.hexagon = _make_hexagon(self.hex_radius, self.hex_height)
+        self.pentagon = make_pentagon(self.pen_radius, self.hex_height, 0)
+        self.hexagon = make_hexagon(self.hex_radius, self.hex_height, 0)
 
-        self.pentagon_cut = _make_pentagon(
+        self.pentagon_cut = make_pentagon(
             self.pen_radius - self.pen_radius_cut,
-            self.hex_height
+            self.hex_height,
+            0
         )
-        self.hexagon_cut = _make_hexagon(
+        self.hexagon_cut = make_hexagon(
             self.hex_radius - self.hex_radius_cut,
-            self.hex_height
+            self.hex_height,
+            0
         )
-
 
 
     def __make_hexagon_cut_key(self):
-        hexagon_cut = _make_hexagon(
-            self.hex_radius-9.225-1,
-            2
-        )
+        bp = greeble.CutKeyHexagon()
+        bp.radius = self.hex_radius-9.225-1
+        bp.make()
+        self.hexagon_cut_key_bp = bp
 
-        logo_text = (
-            cq.Workplane("XY")
-            .text("MiniForAll",10, 2)
-            #.rotate((0,1,0),(0,0,0),180)
-            .translate((-.5,0,0))
-        )
-
-        cut_hole = cq.Workplane("XY").cylinder(3,1.5).translate((0,17,0))
-        self.hexagon_cut_key = (
-            hexagon_cut
-            .union(logo_text)
-            .cut(cut_hole)
-            .translate((0,0,2/2))
-        )
 
     def __make_pentagon_cut_key(self):
+        bp = greeble.CutKeyPentagon()
+        bp.radius = self.pen_radius-10.225-1
+        bp.make()
+        self.pentagon_cut_key_bp = bp
 
-        pentagon_cut = _make_pentagon(
-            self.pen_radius-10.225-1,
-            2
-        )
-
-        logo_text = (
-            cq.Workplane("XY")
-            .text("MiniForAll",7, 2)
-            #.rotate((0,1,0),(0,0,0),180)
-            .translate((-.5,0,0))
-        )
-
-        cut_hole = cq.Workplane("XY").cylinder(3,1.5).translate((0,12,0))
-        self.pentagon_cut_key = (
-            pentagon_cut
-            .union(logo_text)
-            .cut(cut_hole)
-            .translate((0,0,2/2))
-            )
 
     def build(self):
         super().build()
@@ -167,21 +119,21 @@ class Dome(Base):
         if self.render_cut_keys:
             dome = (
                 dome
-                .union(self.hexagon_cut_key)
-                .union(self.pentagon_cut_key.translate((43,0,0)))
+                .union(self.hexagon_cut_key_bp.build())
+                .union(self.pentagon_cut_key_bp.build().translate((43,0,0)))
             )
 
         #greebles
-        if self.vent_greeble:
+        if self.vent_bp:
             greebled_r1 = self.__build_ring1(
-                self.vent_greeble,
+                self.vent_bp.build(),
                 None,
                 keep_hex = self.r1_greeble
             )
 
-        if self.vent_greeble:
+        if self.door_bp:
             greebled_r2 = self.__build_ring2(
-                self.door_greeble.rotate((0,0,1),(0,0,0),-30),
+                self.door_bp.build().rotate((0,0,1),(0,0,0),-30),
                 None,
                 keep_hex = self.r2_greeble_hex
             )
@@ -193,6 +145,7 @@ class Dome(Base):
         )
 
         return dome
+
 
     def build_frame(self):
         dome = cq.Workplane("XY")
@@ -212,7 +165,6 @@ class Dome(Base):
             .cut(ring_2_cut)
         )
 
-
         dome = (
             dome
             .translate((0,0,60))
@@ -228,15 +180,15 @@ class Dome(Base):
         if self.render_cut_keys:
             dome = (
                 dome
-                .union(self.hexagon_cut_key)
-                .union(self.pentagon_cut_key.translate((43,0,0)))
+                .union(self.hexagon_cut_key_bp.build())
+                .union(self.pentagon_cut_key_bp.build().translate((43,0,0)))
             )
 
-        if self.vent_greeble:
+        if self.vent_bp:
             dome = (
                 dome
                 .add(
-                    self.vent_greeble
+                    self.vent_bp.build()
                     .translate((
                         0,
                         -1*(self.hex_radius - self.hex_radius_cut)+5,
@@ -245,11 +197,11 @@ class Dome(Base):
                 )
             )
 
-        if self.door_greeble:
+        if self.door_bp:
             dome = (
                 dome
                 .add(
-                    self.door_greeble
+                    self.door_bp.build()
                     .rotate((0,0,1),(0,0,0),90)
                     .rotate((1,0,0),(0,0,0),90)
                     .translate((
@@ -262,21 +214,22 @@ class Dome(Base):
 
         return dome
 
+
     def build_plate_parts(self):
         dome = self.build_frame()
 
         if self.render_cut_keys:
             keys = (
                 cq.Workplane("XY")
-                .union(self.hexagon_cut_key)
-                .union(self.pentagon_cut_key.translate((43,0,0)))
+                .union(self.hexagon_cut_key_bp.build())
+                .union(self.pentagon_cut_key_bp.build().translate((43,0,0)))
             )
 
-        if self.vent_greeble:
+        if self.vent_bp:
             vent = (
                 cq.Workplane("XY")
                 .add(
-                    self.vent_greeble
+                    self.vent_bp.build()
                     .translate((
                         0,
                         -1*(self.hex_radius - self.hex_radius_cut)+5,
@@ -287,11 +240,11 @@ class Dome(Base):
         else:
             vent = None
 
-        if self.door_greeble:
+        if self.door_bp:
             door = (
                 cq.Workplane("XY")
                 .add(
-                    self.door_greeble
+                    self.door_bp.build()
                     .rotate((0,0,1),(0,0,0),90)
                     .rotate((1,0,0),(0,0,0),90)
                     .translate((
@@ -303,6 +256,7 @@ class Dome(Base):
             )
 
         return dome, vent, door, keys
+
 
     def __build_ring1(self, hex_shape, pen_shape, keep_hex=None):
         h =  _rotate(hex_shape,self.r1_x_rotate,0)

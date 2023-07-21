@@ -9,4 +9,4 @@ bp.make()
 test = bp.build()
 
 #show_object(test)
-cq.exporters.export(test, "./stl/dome_v2.stl")
+cq.exporters.export(test, "./stl/dome_v2_test.stl")
