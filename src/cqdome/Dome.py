@@ -38,21 +38,22 @@ class Dome(Base):
 
         # greebles
         self.greebles_bp = []
-        self.r1_greeble = [1]
-        self.r2_greeble_hex = [0,2]
+        #self.r1_greeble = [1]
+        #self.r2_greeble_hex = [0,2]
 
         # door
         #self.door_frame_inset = 4
         #self.door_hinge_x_translate = -4.3
 
         # render flags
-        self.render_cut_keys = True
+        #self.render_cut_keys = True
+        self.render_greebles = True
 
         # Blueprints
-        self.hexagon_cut_key_bp = None
-        self.pentagon_cut_key_bp = None
-        self.door_bp = None
-        self.vent_bp = None
+        #self.hexagon_cut_key_bp = None
+        #self.pentagon_cut_key_bp = None
+        #self.door_bp = None
+        #self.vent_bp = None
 
         #--- shapes
         self.pentagon = None
@@ -108,18 +109,18 @@ class Dome(Base):
         )
 
 
-    def __make_hexagon_cut_key(self):
-        bp = greeble.CutKeyHexagon()
-        bp.radius = self.hex_radius-9.225-1
-        bp.make()
-        self.hexagon_cut_key_bp = bp
+    #def __make_hexagon_cut_key(self):
+    #    bp = greeble.CutKeyHexagon()
+    #    bp.radius = self.hex_radius-9.225-1
+    ##    bp.make()
+    #    self.hexagon_cut_key_bp = bp
 
 
-    def __make_pentagon_cut_key(self):
-        bp = greeble.CutKeyPentagon()
-        bp.radius = self.pen_radius-10.225-1
-        bp.make()
-        self.pentagon_cut_key_bp = bp
+    #def __make_pentagon_cut_key(self):
+    #    bp = greeble.CutKeyPentagon()
+    #    bp.radius = self.pen_radius-10.225-1
+    #    bp.make()
+    #    self.pentagon_cut_key_bp = bp
 
 
     def build(self):
@@ -131,37 +132,38 @@ class Dome(Base):
         #greebles
 
         ## center greeble
-        print(self.greebles_bp)
-        if self.greebles_bp and len(self.greebles_bp) > 0:
+        #print(self.greebles_bp)
+        if self.render_greebles:
+            if self.greebles_bp and len(self.greebles_bp) > 0:
 
-            center_bp = None
-            hexes_bp = None
-            center_pentagon = None
-            if self.greebles_bp[0] and self.greebles_bp[0].build:
-                center_pentagon = self.greebles_bp[0].build()
+                center_bp = None
+                hexes_bp = None
+                center_pentagon = None
+                if self.greebles_bp[0] and self.greebles_bp[0].build:
+                    center_pentagon = self.greebles_bp[0].build()
 
-            if len(self.greebles_bp) > 1:
-                hexes_bp = self.greebles_bp[1:6]
+                if len(self.greebles_bp) > 1:
+                    hexes_bp = self.greebles_bp[1:6]
 
-            greebled_r1 = self.__build_ring1_list(
-                hexes_bp,
-                center_pentagon
-            )
-            
-        pentagons_bp = None
-        hexagons_bp = None
-        if len(self.greebles_bp) > 6:
-            pentagons_bp = self.greebles_bp[6::2]
+                greebled_r1 = self.__build_ring1_list(
+                    hexes_bp,
+                    center_pentagon
+                )
+                
+            pentagons_bp = None
+            hexagons_bp = None
+            if len(self.greebles_bp) > 6:
+                pentagons_bp = self.greebles_bp[6::2]
 
-        if len(self.greebles_bp) > 6:
-            hexagons_bp = self.greebles_bp[7::2]
+            if len(self.greebles_bp) > 6:
+                hexagons_bp = self.greebles_bp[7::2]
 
-        if pentagons_bp or hexagons_bp:
-            print(f'pentagons_bp {pentagons_bp}, hexagons_bp {hexagons_bp}')
-            greebled_r2 = self.__build_ring2_list(
-                hexagons_bp,
-                pentagons_bp,
-            )
+            if pentagons_bp or hexagons_bp:
+                print(f'pentagons_bp {pentagons_bp}, hexagons_bp {hexagons_bp}')
+                greebled_r2 = self.__build_ring2_list(
+                    hexagons_bp,
+                    pentagons_bp,
+                )
 
         #if self.door_bp:
         #    greebled_r2 = self.__build_ring2(
@@ -210,25 +212,25 @@ class Dome(Base):
     def build_plate(self):
         dome = self.build_frame()
 
-        if self.render_cut_keys:
-            dome = (
-                dome
-                .union(self.hexagon_cut_key_bp.build())
-                .union(self.pentagon_cut_key_bp.build().translate((43,0,0)))
-            )
+        #if self.render_cut_keys:
+        #    dome = (
+        #        dome
+        #        .union(self.hexagon_cut_key_bp.build())
+        #        .union(self.pentagon_cut_key_bp.build().translate((43,0,0)))
+        #    )
 
-        if self.vent_bp:
-            dome = (
-                dome
-                .add(
-                    self.vent_bp.build()
-                    .translate((
-                        0,
-                        -1*(self.hex_radius - self.hex_radius_cut)+5,
-                        self.hex_height/2
-                    ))
-                )
-            )
+        #if self.vent_bp:
+        #    dome = (
+        #        dome
+        #        .add(
+        #            self.vent_bp.build()
+        #            .translate((
+        #                0,
+        #                -1*(self.hex_radius - self.hex_radius_cut)+5,
+        #                self.hex_height/2
+        #            ))
+        #        )
+        #    )
 
         if self.door_bp:
             dome = (
@@ -248,47 +250,47 @@ class Dome(Base):
         return dome
 
 
-    def build_plate_parts(self):
-        dome = self.build_frame()
+    #def build_plate_parts(self):
+    #    dome = self.build_frame()
 
-        if self.render_cut_keys:
-            keys = (
-                cq.Workplane("XY")
-                .union(self.hexagon_cut_key_bp.build())
-                .union(self.pentagon_cut_key_bp.build().translate((43,0,0)))
-            )
+    #    if self.render_cut_keys:
+    #        keys = (
+    #            cq.Workplane("XY")
+    #            .union(self.hexagon_cut_key_bp.build())
+    #            .union(self.pentagon_cut_key_bp.build().translate((43,0,0)))
+    #        )
 
-        if self.vent_bp:
-            vent = (
-                cq.Workplane("XY")
-                .add(
-                    self.vent_bp.build()
-                    .translate((
-                        0,
-                        -1*(self.hex_radius - self.hex_radius_cut)+5,
-                        self.hex_height/2
-                    ))
-                )
-            )
-        else:
-            vent = None
+        #if self.vent_bp:
+        #    vent = (
+        #        cq.Workplane("XY")
+        #        .add(
+        #            self.vent_bp.build()
+        #            .translate((
+        #                0,
+        #                -1*(self.hex_radius - self.hex_radius_cut)+5,
+        #                self.hex_height/2
+        #            ))
+        #        )
+        #    )
+        #else:
+        #    vent = None
 
-        if self.door_bp:
-            door = (
-                cq.Workplane("XY")
-                .add(
-                    self.door_bp.build()
-                    .rotate((0,0,1),(0,0,0),90)
-                    .rotate((1,0,0),(0,0,0),90)
-                    .translate((
-                        0,
-                        1*(self.hex_radius - self.hex_radius_cut)-5,
-                        self.hex_height/2
-                    ))
-                )
-            )
+        #if self.door_bp:
+        #    door = (
+        #        cq.Workplane("XY")
+        #        .add(
+        #            self.door_bp.build()
+        #            .rotate((0,0,1),(0,0,0),90)
+        #            .rotate((1,0,0),(0,0,0),90)
+        #            .translate((
+        #                0,
+        #                1*(self.hex_radius - self.hex_radius_cut)-5,
+        #                self.hex_height/2
+        #            ))
+        #        )
+        #    )
 
-        return dome, vent, door, keys
+    #    return dome, vent, door, keys
 
 
     def __build_ring1(self, hex_shape, pen_shape, keep_hex=None):

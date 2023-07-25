@@ -2,6 +2,10 @@
 
 ## Main wip
 
+## 0.0.5
+* Added initial stairs in examples
+* Added Window Frames
+
 ## 0.0.4
 * overhauling how greebles are added to the dome.
 * Each panel is now independently addressable and can have it's own greeble assigned to it.

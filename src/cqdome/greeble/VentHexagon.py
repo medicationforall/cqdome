@@ -8,7 +8,7 @@ class VentHexagon(BaseHexagon):
         super().__init__()
         self.radius=58
         self.height=4
-        self.frame_size = 9
+        self.frame_size = 5
         self.vent_width = 2
         self.vent_space = 0.6
         self.vent_rotate=45

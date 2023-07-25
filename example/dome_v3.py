@@ -1,12 +1,24 @@
 import cadquery as cq
 from cqdome import Dome, greeble
 
-test_bp = greeble.CutKeyPentagon()
-test_bp_2 = greeble.CutKeyHexagon()
+bp_0 = greeble.CutKeyPentagon()
+bp_0.text='0'
+
+bp_1 = greeble.CutKeyHexagon()
+bp_1.text='1'
+
+
 #test_bp_2.text_height=10
 vent_bp = greeble.VentHexagon()
 door_bp = greeble.DoorHexagon()
 door_bp.hinge_x_translate = -4.5
+
+window_pen_bp = greeble.WindowFrame()
+window_pen_bp.type="pentagon"
+
+window_hex_bp = greeble.WindowFrame()
+window_hex_bp.type="hexagon"
+
 
 bp = Dome()
 bp.render_cut_keys = False
@@ -17,18 +29,57 @@ bp.r2_greeble_hex = [1,2]
 bp.greebles_bp.append(None)
 
 #ring 1
-bp.greebles_bp.append(None)
+bp.greebles_bp.append(vent_bp)
 bp.greebles_bp.append(None)
 bp.greebles_bp.append(None)
 bp.greebles_bp.append(None)
 bp.greebles_bp.append(None)
 
 #ring2
-#bp.greebles_bp.append(vent_bp)
-bp.make()
-#door_bp.parent=None
-#door_bp.make()
-dome = bp.build()
-#show_object(dome)
+bp.greebles_bp.append(None)
+bp.greebles_bp.append(None)
+bp.greebles_bp.append(None)
+bp.greebles_bp.append(None)
+bp.greebles_bp.append(None)
+bp.greebles_bp.append(None)
+bp.greebles_bp.append(None)
+bp.greebles_bp.append(window_hex_bp)
+bp.greebles_bp.append(window_pen_bp)
+bp.greebles_bp.append(door_bp)
 
-cq.exporters.export(dome, "./stl/dome_v3_test.stl")
+bp.render_greebles = True
+bp.make()
+dome = bp.build()
+
+#greebles = (
+#    cq.Workplane("XY")
+#    .add(window_pen_bp.build().translate((42,0,2)))
+#    .add(window_hex_bp.build().translate((0,0,2)))
+    #.add(vent_bp.build().translate((0,-44,2)))
+    #.add(door_bp.build().translate((0,44,2)))
+#)
+
+#show_object(dome)
+#show_object(greebles)
+
+window_hex_frame = (
+    window_hex_bp.build()
+    .rotate((0,0,1),(0,0,0),60)
+    .rotate((1,0,0),(0,0,0),90)
+    .translate((0,20,0))
+)
+
+window_pen_frame = (
+    window_pen_bp.build()
+    .rotate((0,0,1),(0,0,0),54+36)
+    .rotate((1,0,0),(0,0,0),90)
+    .translate((0,0,0))
+)
+
+#show_object(window_hex_frame) 
+#show_object(window_pen_frame)
+
+#cq.exporters.export(dome, "./stl/dome_v3_test.stl")
+#cq.exporters.export(greebles, "./stl/dome_v3_greebles.stl")
+cq.exporters.export(window_hex_frame, "./stl/dome_v3_hex_frame.stl")
+cq.exporters.export(window_pen_frame, "./stl/dome_v3_pen_frame.stl")

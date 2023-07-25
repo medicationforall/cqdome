@@ -23,7 +23,7 @@ class CutKeyPentagon(BasePentagon):
         radius = self.radius
 
         if self.parent and hasattr(self.parent, "pen_radius") and hasattr(self.parent, "pen_radius_cut"):
-            radius = self.parent.hex_radius - self.parent.hex_radius_cut
+            radius = self.parent.pen_radius - self.parent.pen_radius_cut
         return radius
 
     def make(self, parent=None):
