@@ -1,14 +1,15 @@
 import cadquery as cq
-from . import make_hexagon, make_pentagon
-from .. import Base
-
-import cadquery as cq
-from . import make_hexagon, make_pentagon
+from . import make_hexagon, make_pentagon, CutKeyHexagon, CutKeyPentagon
 from .. import Base
 
 _types = {
     'hexagon':make_hexagon, 
     'pentagon':make_pentagon
+}
+
+_key_classes = {
+    "hexagon":CutKeyHexagon.CutKeyHexagon, 
+    "pentagon":CutKeyPentagon.CutKeyPentagon
 }
 
 class WindowFrame(Base):
@@ -17,31 +18,36 @@ class WindowFrame(Base):
         self.type = "hexagon" # hexagon, pentagon
         self.radius = 58
         self.height = 4
-        self.pane_height = 1
+        self.margin = 0 # used when determing outside radius
+    
+        self.pane_height = 1 # internal cut height
         self.inner_pane_padding = 2
-        self.pane_rail_translate = 0
+        self.pane_rail_translate = 0 
         self.frame_size = 5
 
         self.outline = None
         self.pane_rail = None
         self.frame = None
-        self.cut_key = None
+        self.cut_key_bp = None
+
 
     def _calc_radius(self):
         radius = self.radius
 
         if self.type == "pentagon" and self.parent and hasattr(self.parent, "pen_radius") and hasattr(self.parent, "pen_radius_cut"):
-            radius = self.parent.pen_radius - self.parent.pen_radius_cut
+            radius = self.parent.pen_radius - self.parent.pen_radius_cut - self.margin
         elif self.type == "hexagon" and self.parent and hasattr(self.parent, "hex_radius") and hasattr(self.parent, "hex_radius_cut"):
-            radius = self.parent.hex_radius - self.parent.hex_radius_cut
+            radius = self.parent.hex_radius - self.parent.hex_radius_cut - self.margin
         return radius
-        
+
+
     def _resolve_make_method(self):
         if(self.type in _types):
             return _types[self.type]
         else:
             raise Exception(f'unknown make method type {self.type}')
-            
+
+
     def __make_frame(self):
         radius = self._calc_radius()
         make_method = self._resolve_make_method()
@@ -72,11 +78,25 @@ class WindowFrame(Base):
         )
 
 
+    def __make_cut_key(self):
+        inner_radius = self._calc_radius() - self.frame_size #+ self.inner_pane_padding
+        
+        if self.type in _key_classes:
+            self.cut_key_bp = _key_classes[self.type]()
+        else:
+            raise Exception(f"Unknown type {self.type}")
+
+        self.cut_key_bp.radius = inner_radius
+        #self.cut_key_bp.height = self.height
+        self.cut_key_bp.text = f" {self.type[:3]} Key"
+        self.cut_key_bp.make()
+
 
     def make(self, parent=None):
         super().make(parent)
         self.__make_frame()
         self.__make_pane_rail()
+        self.__make_cut_key()
 
 
     def build(self):

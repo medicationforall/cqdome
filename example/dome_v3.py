@@ -15,6 +15,7 @@ door_bp.hinge_x_translate = -4.5
 
 window_pen_bp = greeble.WindowFrame()
 window_pen_bp.type="pentagon"
+window_pen_bp.margin=.1
 
 window_hex_bp = greeble.WindowFrame()
 window_hex_bp.type="hexagon"
@@ -76,6 +77,14 @@ window_pen_frame = (
     .translate((0,0,0))
 )
 
+pen_key = (
+    window_pen_bp.cut_key_bp.build()
+)
+
+hex_key = (
+    window_hex_bp.cut_key_bp.build()
+)
+
 #show_object(window_hex_frame) 
 #show_object(window_pen_frame)
 
@@ -83,3 +92,5 @@ window_pen_frame = (
 #cq.exporters.export(greebles, "./stl/dome_v3_greebles.stl")
 cq.exporters.export(window_hex_frame, "./stl/dome_v3_hex_frame.stl")
 cq.exporters.export(window_pen_frame, "./stl/dome_v3_pen_frame.stl")
+cq.exporters.export(hex_key, "./stl/dome_v3_hex_key.stl")
+cq.exporters.export(pen_key, "./stl/dome_v3_pen_key.stl")
