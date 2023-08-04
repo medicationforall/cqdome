@@ -79,7 +79,7 @@ class WindowFrame(Base):
 
 
     def __make_cut_key(self):
-        inner_radius = self._calc_radius() - self.frame_size #+ self.inner_pane_padding
+        inner_radius = self._calc_radius() - self.frame_size + (self.inner_pane_padding/2)
         
         if self.type in _key_classes:
             self.cut_key_bp = _key_classes[self.type]()
