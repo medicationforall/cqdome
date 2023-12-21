@@ -10,4 +10,6 @@ bp.vent_space = 0.6
 bp.vent_rotate = 45
 bp.make()
 vent = bp.build()
+
+#show_object(vent)
 cq.exporters.export(vent,'stl/VentHexagon.stl')

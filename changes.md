@@ -8,6 +8,10 @@
 * Added license blocks
 * Removed old Vent Code
 * Removed old dome implementation attempts
+* Clean up door and vent examples
+* Refactored stairs it was only implemented as an example file. I rewrote the code as a utility class and Base class implementation.
+* Added actual dome stairs example.
+* That stairs need to be parameterized, but it's a lot better than the hack I had left myself.
 
 ## 0.0.5
 * Added initial stairs in examples

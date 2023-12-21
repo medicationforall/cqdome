@@ -23,4 +23,6 @@ bp.handle_length = 5
 bp.handle_width = 7
 bp.make()
 door = bp.build()
+
+#show_object(door)
 cq.exporters.export(door,'stl/doorHexagon.stl')
