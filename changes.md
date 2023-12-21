@@ -2,6 +2,13 @@
 
 ## Main wip
 
+## 0.1.0
+* Upped cqterrain version to 0.3.0
+* Removed local Base class and instead resolve Base from cadqueryhelper
+* Added license blocks
+* Removed old Vent Code
+* Removed old dome implementation attempts
+
 ## 0.0.5
 * Added initial stairs in examples
 * Added Window Frames

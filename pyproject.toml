@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cqdome"
-version = "0.0.2"
+version = "0.1.0"
 authors = [
   { name="James Adams", email="inklink28@gmail.com" }
 ]
@@ -19,7 +19,7 @@ classifiers = [
 ]
 
 dependencies = [
-'cqterrain @ git+https://github.com/medicationforall/cqterrain@0.1.7'
+'cqterrain @ git+https://github.com/medicationforall/cqterrain@0.3.0'
 ]
 
 
