@@ -16,6 +16,7 @@
 import cadquery as cq
 from . import make_hexagon, make_pentagon, CutKeyHexagon, CutKeyPentagon
 from cadqueryhelper import Base
+from typing import Literal
 
 _types = {
     'hexagon':make_hexagon, 
@@ -23,30 +24,29 @@ _types = {
 }
 
 _key_classes = {
-    "hexagon":CutKeyHexagon.CutKeyHexagon, 
-    "pentagon":CutKeyPentagon.CutKeyPentagon
+    "hexagon":CutKeyHexagon, 
+    "pentagon":CutKeyPentagon
 }
 
 class WindowFrame(Base):
     def __init__(self):
         super().__init__()
-        self.type = "hexagon" # hexagon, pentagon
-        self.radius = 58
-        self.height = 4
-        self.margin = 0 # used when determing outside radius
+        self.type:Literal["hexagon", "pentagon"] = "hexagon" # hexagon, pentagon
+        self.radius:float = 58
+        self.height:float = 4
+        self.margin:float = 0 # used when determing outside radius
     
-        self.pane_height = 1 # internal cut height
-        self.inner_pane_padding = 2
-        self.pane_rail_translate = 0 
-        self.frame_size = 5
+        self.pane_height:float = 1 # internal cut height
+        self.inner_pane_padding:float = 2
+        self.pane_rail_translate:float = 0 
+        self.frame_size:float = 5
 
-        self.outline = None
-        self.pane_rail = None
-        self.frame = None
+        self.outline:cq.Workplane|None = None
+        self.pane_rail:cq.Workplane|None = None
+        self.frame:cq.Workplane|None = None
         self.cut_key_bp = None
 
-
-    def _calc_radius(self):
+    def _calc_radius(self) -> float:
         radius = self.radius
 
         if self.type == "pentagon" and self.parent and hasattr(self.parent, "pen_radius") and hasattr(self.parent, "pen_radius_cut"):
@@ -114,13 +114,14 @@ class WindowFrame(Base):
         self.__make_cut_key()
 
 
-    def build(self):
+    def build(self)->cq.Workplane:
         super().build()
-        test = cq.Workplane("XY").box(10, 10, 10)
-        
-        window = (
-            cq.Workplane("XY")
-            .union(self.frame)
-            .cut(self.pane_rail)
-        )
+        window = cq.Workplane("XY")
+
+        if self.frame:
+            window = window.union(self.frame)
+
+        if self.pane_rail:
+            window = window.cut(self.pane_rail)
+
         return window

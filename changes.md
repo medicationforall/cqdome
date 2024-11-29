@@ -2,6 +2,12 @@
 
 ## Main wip
 
+## 1.0.0
+* Added type annotations
+* Upped cqterrain version to 1.0.0
+* Added example_runner.py
+* Updated README.md
+
 ## 0.1.0
 * Upped cqterrain version to 0.3.0
 * Removed local Base class and instead resolve Base from cadqueryhelper

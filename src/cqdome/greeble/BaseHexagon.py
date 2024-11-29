@@ -15,7 +15,11 @@
 import cadquery as cq
 from cadqueryhelper import Base
 
-def make_hexagon(radius, height, z_rotate = 30):
+def make_hexagon(
+        radius:float, 
+        height:float, 
+        z_rotate:float = 30
+    )-> cq.Workplane:
     hexagon = (
         cq.Workplane("XY")
         .polygon(6, radius)
@@ -29,5 +33,5 @@ def make_hexagon(radius, height, z_rotate = 30):
 class BaseHexagon(Base):
     def __init__(self):
         super().__init__()
-        self.radius = 58
-        self.height = 4
+        self.radius:float = 58
+        self.height:float = 4

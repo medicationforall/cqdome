@@ -42,9 +42,9 @@ door_bp = greeble.DoorHexagon()
 door_bp.hinge_x_translate = -4.5
 
 bp = Dome()
-bp.render_cut_keys = False
-bp.r1_greeble = []
-bp.r2_greeble_hex = [1,2]
+#bp.render_cut_keys = False
+#bp.r1_greeble = []
+#bp.r2_greeble_hex = [1,2]
 
 #center
 bp.greebles_bp.append(bp_0)

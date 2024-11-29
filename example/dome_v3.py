@@ -22,9 +22,9 @@ window_hex_bp.type="hexagon"
 
 
 bp = Dome()
-bp.render_cut_keys = False
-bp.r1_greeble = []
-bp.r2_greeble_hex = [1,2]
+#bp.render_cut_keys = False
+#bp.r1_greeble = []
+#bp.r2_greeble_hex = [1,2]
 
 #center
 bp.greebles_bp.append(None)

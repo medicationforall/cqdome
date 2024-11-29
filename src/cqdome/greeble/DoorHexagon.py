@@ -24,45 +24,45 @@ def _check_chamfer(height, chamfer):
 class DoorHexagon(BaseHexagon):
     def __init__(self):
         super().__init__()
-        self.radius = 58
-        self.height = 4
+        self.radius:float = 58
+        self.height:float = 4
 
-        self.frame_inset = 4
+        self.frame_inset:float = 4
 
         # door
-        self.door_padding = .5
-        self.door_chamfer = 1.5
-        self.door_height = 4
+        self.door_padding:float = .5
+        self.door_chamfer:float = 1.5
+        self.door_height:float = 4
 
         #hinge
-        self.hinge_length = 4
-        self.hinge_width = 16
-        self.hinge_height = 5
-        self.hinge_cylinder_height = 20
-        self.hinge_cylinder_radius = 2.5
-        self.hinge_x_translate= -4.3 #-3.5
+        self.hinge_length:float = 4
+        self.hinge_width:float = 16
+        self.hinge_height:float = 5
+        self.hinge_cylinder_height:float = 20
+        self.hinge_cylinder_radius:float = 2.5
+        self.hinge_x_translate:float = -4.3 #-3.5
 
         # handle
-        self.handle_x_translate = 8.5
-        self.handle_length = 5
-        self.handle_width = 7
+        self.handle_x_translate:float = 8.5
+        self.handle_length:float = 5
+        self.handle_width:float = 7
 
         # parts
-        self.hexagon = None
-        self.hexagon_cut = None
-        self.frame = None
-        self.hinge = None
-        self.door_body = None
-        self.handle_outline = None
-        self.handle_detail = None
+        self.hexagon:cq.Workplane|None = None
+        self.hexagon_cut:cq.Workplane|None = None
+        self.frame:cq.Workplane|None = None
+        self.hinge:cq.Workplane|None = None
+        self.door_body:cq.Workplane|None = None
+        self.handle_outline:cq.Workplane|None = None
+        self.handle_detail:cq.Workplane|None = None
 
 
-    def _calc_radius(self):
+    def _calc_radius(self)->float:
         radius = self.radius
 
         if self.parent and hasattr(self.parent, "hex_radius") and hasattr(self.parent, "hex_radius_cut"):
             radius = self.parent.hex_radius - self.parent.hex_radius_cut
-            print(f'door _calc_radius set calculated radius {radius}, {self.parent.hex_radius}, {self.parent.hex_radius_cut}')
+            #print(f'door _calc_radius set calculated radius {radius}, {self.parent.hex_radius}, {self.parent.hex_radius_cut}')
         return radius
 
     def make(self,parent=None):
@@ -83,9 +83,10 @@ class DoorHexagon(BaseHexagon):
         self.frame = (
             cq.Workplane("XY")
             .union(self.hexagon)
-            .cut(self.hexagon_cut)
         )
 
+        if self.hexagon_cut:
+            self.frame = self.frame.cut(self.hexagon_cut)
 
     def __make_door_body(self):
         radius = self._calc_radius()
@@ -97,7 +98,6 @@ class DoorHexagon(BaseHexagon):
         )
 
         self.door_body = door
-
 
     def __make_hinge(self):
         hinge_box = (
@@ -138,19 +138,29 @@ class DoorHexagon(BaseHexagon):
         self.handle_detail = handle_detail
 
 
-    def build(self):
+    def build(self) -> cq.Workplane:
         super().build()
         radius = self._calc_radius()
         cut_radius = radius - self.frame_inset
         assembly = (
             cq.Workplane("XY")
-            .union(self.frame.translate((0,0,0)))
-            .union(self.door_body)
-            .union(
+        )
+
+        if self.frame:
+            assembly = assembly.union(self.frame)
+
+        if self.door_body:
+            assembly = assembly.union(self.door_body)
+
+        if self.hinge:
+            assembly = assembly.union(
                 self.hinge
                 .translate((-1*(cut_radius/2) - self.hinge_x_translate,0,0))
             )
-            .cut(self.handle_outline.translate(((cut_radius/2) - self.handle_x_translate,0,0)))
-            .union(self.handle_detail.translate(((cut_radius/2) - self.handle_x_translate,0,0)))
-        )
+        if self.handle_outline:
+            assembly = assembly.cut(self.handle_outline.translate(((cut_radius/2) - self.handle_x_translate,0,0)))
+
+        if self.handle_detail:
+            assembly = assembly.union(self.handle_detail.translate(((cut_radius/2) - self.handle_x_translate,0,0)))
+
         return assembly.rotate((0,0,1),(0,0,0), -30)

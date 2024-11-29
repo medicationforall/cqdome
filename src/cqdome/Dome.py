@@ -17,7 +17,7 @@ import cadquery as cq
 from cadqueryhelper import Base
 from .greeble import make_hexagon, make_pentagon
 
-def _rotate(shape, x_rotate=0, z_rotate=0):
+def _rotate(shape:cq.Workplane, x_rotate:float=0, z_rotate:float=0):
     if shape:
         shape = (
             cq.Workplane("XY")
@@ -31,39 +31,38 @@ def _rotate(shape, x_rotate=0, z_rotate=0):
 class Dome(Base):
     def __init__(self):
         super().__init__()
-        self.hex_radius = 58
-        self.hex_pen_diff = 7
-        self.hex_height = 4
-        self.hex_radius_cut = 9
+        self.hex_radius:float = 58
+        self.hex_pen_diff:float = 7
+        self.hex_height:float = 4
+        self.hex_radius_cut:float = 9
 
-        self.pen_radius = self.hex_radius - self.hex_pen_diff
-        self.pen_radius_cut = 10
+        self.pen_radius:float = self.hex_radius - self.hex_pen_diff
+        self.pen_radius_cut:float = 10
 
         # rotates
-        self.r1_x_rotate = 32
+        self.r1_x_rotate:float = 32
 
-        self.r2_x_rotate = -58
-        self.r2_z_rotate = 30
+        self.r2_x_rotate:float = -58
+        self.r2_z_rotate:float = 30
 
-        self.r2_pen_x_rotate = 63
-        self.r2_pen_z_rotate = 54
+        self.r2_pen_x_rotate:float = 63
+        self.r2_pen_z_rotate:float = 54
 
-        self.r3_x_rotate = 92
-        self.r3_z_rotate = 30
+        self.r3_x_rotate:float = 92
+        self.r3_z_rotate:float = 30
 
         # greebles
         self.greebles_bp = []
 
         # render flags
-        #self.render_cut_keys = True
-        self.render_greebles = True
+        self.render_greebles:bool = True
 
         #--- shapes
-        self.pentagon = None
-        self.pentagon_cut = None
-        self.hexagon = None
-        self.hexagon_cut = None
-        self.box_cut = None
+        self.pentagon:cq.Workplane|None = None
+        self.pentagon_cut:cq.Workplane|None = None
+        self.hexagon:cq.Workplane|None = None
+        self.hexagon_cut:cq.Workplane|None = None
+        self.box_cut:cq.Workplane|None = None
 
 
     def make(self, parent=None):
@@ -92,7 +91,7 @@ class Dome(Base):
         )
 
 
-    def build(self):
+    def build(self)->cq.Workplane:
         super().build()
         dome = self.build_frame()
         greebled_r1 = None
@@ -105,7 +104,6 @@ class Dome(Base):
         if self.render_greebles:
             if self.greebles_bp and len(self.greebles_bp) > 0:
 
-                center_bp = None
                 hexes_bp = None
                 center_pentagon = None
                 if self.greebles_bp[0] and self.greebles_bp[0].build:
@@ -128,7 +126,7 @@ class Dome(Base):
                 hexagons_bp = self.greebles_bp[7::2]
 
             if pentagons_bp or hexagons_bp:
-                print(f'pentagons_bp {pentagons_bp}, hexagons_bp {hexagons_bp}')
+                #print(f'pentagons_bp {pentagons_bp}, hexagons_bp {hexagons_bp}')
                 greebled_r2 = self.__build_ring2_list(
                     hexagons_bp,
                     pentagons_bp,
@@ -147,11 +145,15 @@ class Dome(Base):
     def build_frame(self):
         dome = cq.Workplane("XY")
 
-        solid_dome = self.__build_ring1(self.hexagon, self.pentagon)
-        cut_dome = self.__build_ring1(self.hexagon_cut, self.pentagon_cut)
-        ring_2 = self.__build_ring2(self.hexagon, self.pentagon)
-        ring_2_cut = self.__build_ring2(self.hexagon_cut, self.pentagon_cut)
-        ring_3 = self.__build_ring_3(self.hexagon)
+        if self.hexagon and self.pentagon:
+            solid_dome = self.__build_ring1(self.hexagon, self.pentagon)
+            ring_2 = self.__build_ring2(self.hexagon, self.pentagon)
+            ring_3 = self.__build_ring_3(self.hexagon)
+
+        if self.hexagon_cut and self.pentagon_cut:
+            cut_dome = self.__build_ring1(self.hexagon_cut, self.pentagon_cut)
+            ring_2_cut = self.__build_ring2(self.hexagon_cut, self.pentagon_cut)
+        
 
         dome = (
             dome
@@ -162,16 +164,17 @@ class Dome(Base):
             .cut(ring_2_cut)
         )
 
-        dome = (
-            dome
-            .translate((0,0,60))
-            .cut(self.box_cut.translate((0,0,-1*(150/2))))
-        )
+        if self.box_cut:
+            dome = (
+                dome
+                .translate((0,0,60))
+                .cut(self.box_cut.translate((0,0,-1*(150/2))))
+            )
 
         return dome
 
 
-    def __build_ring1(self, hex_shape, pen_shape, keep_hex=None):
+    def __build_ring1(self, hex_shape:cq.Workplane, pen_shape:cq.Workplane, keep_hex=None):
         h =  _rotate(hex_shape,self.r1_x_rotate,0)
         p =  _rotate(pen_shape,0,0)
         dome = (
@@ -201,7 +204,7 @@ class Dome(Base):
 
         return dome
 
-    def __build_ring1_list(self, hex_list, pen_shape):
+    def __build_ring1_list(self, hex_list, pen_shape:cq.Workplane|None):
         dome = (
             cq.Workplane("XY")
         )
@@ -232,10 +235,11 @@ class Dome(Base):
                         )
                 except IndexError:
                     print("Index doesn't exist!")
+                    raise Exception('Something went awry')
         return dome
 
 
-    def __build_ring2(self, hex_shape, pen_shape, keep_hex = None, keep_pen = None):
+    def __build_ring2(self, hex_shape:cq.Workplane, pen_shape:cq.Workplane, keep_hex = None, keep_pen = None):
         h =  _rotate(hex_shape,self.r2_x_rotate,self.r2_z_rotate)
         p =  _rotate(pen_shape,self.r2_pen_x_rotate,self.r2_pen_z_rotate)
         r2_p_y = 65.6
@@ -291,6 +295,7 @@ class Dome(Base):
                         )
                 except IndexError:
                     print("Index doesn't exist!")
+                    raise Exception('Something went awry')
 
         if pen_list:
             for i in range(5):
@@ -309,11 +314,12 @@ class Dome(Base):
                         )
                 except IndexError:
                     print("Index doesn't exist!")
+                    raise Exception('Something went awry')
 
         return ring
 
 
-    def __build_ring_3(self, hex_shape):
+    def __build_ring_3(self, hex_shape:cq.Workplane):
         h =  _rotate(hex_shape,self.r3_x_rotate,self.r3_z_rotate)
         r3_y=-73
         r3_z=-1

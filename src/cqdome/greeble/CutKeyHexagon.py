@@ -18,22 +18,22 @@ from . import BaseHexagon, make_hexagon
 class CutKeyHexagon(BaseHexagon):
     def __init__(self):
         super().__init__()
-        self.radius = 58
-        self.height = 2
+        self.radius:float = 58
+        self.height:float = 2
 
         #text
-        self.text = "MiniForAll" 
-        self.text_height = 2
-        self.text_size = 10
+        self.text:str = "MiniForAll" 
+        self.text_height:float = 2
+        self.text_size:float = 10
 
         #cut hole
-        self.cut_hole_height = 3
-        self.cut_hole_radius = 1.5
-        self.cut_hole_y_translate = 17
+        self.cut_hole_height:float = 3
+        self.cut_hole_radius:float = 1.5
+        self.cut_hole_y_translate:float = 17
 
-        self.cut_key = None
+        self.cut_key:cq.Workplane|None = None
 
-    def _calc_radius(self):
+    def _calc_radius(self)->float:
         radius = self.radius
 
         if self.parent and hasattr(self.parent, "hex_radius") and hasattr(self.parent, "hex_radius_cut"):
@@ -67,6 +67,9 @@ class CutKeyHexagon(BaseHexagon):
         )
 
 
-    def build(self):
+    def build(self)->cq.Workplane:
         super().make()
-        return self.cut_key
+        if self.cut_key:
+            return self.cut_key
+        else:
+            raise Exception('Unable to resolve cut_key')

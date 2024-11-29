@@ -10,8 +10,6 @@ python Library for making dome terrain.
 
 ## Dependencies
 * [CadQuery 2.1](https://github.com/CadQuery/cadquery)
-* [cqMore](https://github.com/JustinSDK/cqMore)
-* [cadqueryhelper](https://github.com/medicationforall/cadqueryhelper)
 * [cqterrain](https://github.com/medicationforall/cqterrain)
 
 

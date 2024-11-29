@@ -1,11 +1,25 @@
+# Copyright 2023 James Adams
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import cadquery as cq
 
 def make_angled_step(
-    length=30, 
-    width=10, 
-    height=15, 
-    angle = 36
-):
+    length:float = 30, 
+    width:float = 10, 
+    height:float = 15, 
+    angle:float = 36
+) -> cq.Workplane:
     step_half = (
         cq.Workplane("XY")
         .box(length,width,height)
@@ -32,11 +46,11 @@ def make_angled_step(
     return step
 
 def make_angled_steps(
-        length=30, 
-        width=10, 
-        height=15,
-        dec=5
-):
+        length:float = 30, 
+        width:float = 10, 
+        height:float = 15,
+        dec:float = 5
+) -> cq.Workplane:
     steps = cq.Workplane("XY")
 
     for i in range(3):

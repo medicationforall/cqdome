@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import cadquery as cq
 from cadqueryhelper import Base
 
-def make_pentagon(radius, height, z_rotate = 30):
+def make_pentagon(
+        radius:float, 
+        height:float, 
+        z_rotate:float = 30
+    )->cq.Workplane:
+
     hexagon = (
         cq.Workplane("XY")
         .polygon(5, radius)
@@ -30,5 +34,5 @@ def make_pentagon(radius, height, z_rotate = 30):
 class BasePentagon(Base):
     def __init__(self):
         super().__init__()
-        self.radius = 51
-        self.height = 4
+        self.radius:float = 51
+        self.height:float = 4

@@ -21,20 +21,19 @@ import math
 class VentHexagon(BaseHexagon):
     def __init__(self):
         super().__init__()
-        self.radius=58
-        self.height=4
-        self.frame_size = 5
-        self.vent_width = 2
-        self.vent_space = 0.6
-        self.vent_rotate=45
+        self.radius:float = 58
+        self.height:float = 4
+        self.frame_size:float = 5
+        self.vent_width:float = 2
+        self.vent_space:float = 0.6
+        self.vent_rotate:float = 45
 
-        self.hexagon = None
-        self.hexagon_cut = None
-        self.vents = None
+        self.hexagon:cq.Workplane|None = None
+        self.hexagon_cut:cq.Workplane|None = None
+        self.vents:cq.Workplane|None = None
 
-    def _calc_vent_size(self):
+    def _calc_vent_size(self)-> int:
         return math.floor((self.radius - self.frame_size * 2) / (self.vent_space + self.vent_width))
-
 
     def __make_vents(self):
         vent = (
@@ -53,7 +52,7 @@ class VentHexagon(BaseHexagon):
             size = vent_size
         )
 
-    def _calc_radius(self):
+    def _calc_radius(self) -> float:
         radius = self.radius
 
         if self.parent and hasattr(self.parent, "hex_radius") and hasattr(self.parent, "hex_radius_cut"):
@@ -63,7 +62,7 @@ class VentHexagon(BaseHexagon):
     def make(self,parent=None):
         super().make(parent)
 
-        radius = self._calc_radius()
+        radius:float = self._calc_radius()
 
         self.hexagon = make_hexagon(radius, self.height, 0)
         self.hexagon_cut = make_hexagon(radius - self.frame_size, self.height, 0)
@@ -72,9 +71,15 @@ class VentHexagon(BaseHexagon):
 
     def build(self):
         super().build()
+        scene = cq.Workplane("XY")
 
-        return (
-            self.hexagon
-            .cut(self.hexagon_cut)
-            .union(self.vents.intersect(self.hexagon_cut))
-        )
+        if self.hexagon:
+            scene = scene.union(self.hexagon)
+
+        if self.hexagon_cut:
+            scene = scene.cut(self.hexagon_cut)
+
+        if self.vents and self.hexagon_cut:
+            scene = scene.union(self.vents.intersect(self.hexagon_cut))
+
+        return scene
