@@ -8,7 +8,6 @@ bp_1 = greeble.CutKeyHexagon()
 bp_1.text='1'
 
 
-#test_bp_2.text_height=10
 vent_bp = greeble.VentHexagon()
 door_bp = greeble.DoorHexagon()
 door_bp.hinge_x_translate = -4.5
@@ -22,9 +21,6 @@ window_hex_bp.type="hexagon"
 
 
 bp = Dome()
-#bp.render_cut_keys = False
-#bp.r1_greeble = []
-#bp.r2_greeble_hex = [1,2]
 
 #center
 bp.greebles_bp.append(None)
@@ -52,16 +48,14 @@ bp.render_greebles = True
 bp.make()
 dome = bp.build()
 
-#greebles = (
-#    cq.Workplane("XY")
-#    .add(window_pen_bp.build().translate((42,0,2)))
-#    .add(window_hex_bp.build().translate((0,0,2)))
-    #.add(vent_bp.build().translate((0,-44,2)))
-    #.add(door_bp.build().translate((0,44,2)))
-#)
+greebles = (
+    cq.Workplane("XY")
+    .add(window_pen_bp.build().translate((42,0,2)))
+    .add(window_hex_bp.build().translate((0,0,2)))
+    .add(vent_bp.build().translate((0,-44,2)))
+    .add(door_bp.build().translate((0,44,2)))
+)
 
-#show_object(dome)
-#show_object(greebles)
 
 window_hex_frame = (
     window_hex_bp.build()
@@ -78,18 +72,19 @@ window_pen_frame = (
 )
 
 pen_key = (
-    window_pen_bp.cut_key_bp.build()
+    window_pen_bp.cut_key_bp.build() #type:ignore
 )
 
 hex_key = (
-    window_hex_bp.cut_key_bp.build()
+    window_hex_bp.cut_key_bp.build() #type:ignore
 )
 
 #show_object(window_hex_frame) 
 #show_object(window_pen_frame)
 
-#cq.exporters.export(dome, "./stl/dome_v3_test.stl")
-#cq.exporters.export(greebles, "./stl/dome_v3_greebles.stl")
+cq.exporters.export(dome, "./stl/dome_v3_test.stl")
+cq.exporters.export(greebles, "./stl/dome_v3_greebles.stl")
+
 cq.exporters.export(window_hex_frame, "./stl/dome_v3_hex_frame.stl")
 cq.exporters.export(window_pen_frame, "./stl/dome_v3_pen_frame.stl")
 cq.exporters.export(hex_key, "./stl/dome_v3_hex_key.stl")

@@ -164,3 +164,10 @@ class DoorHexagon(BaseHexagon):
             assembly = assembly.union(self.handle_detail.translate(((cut_radius/2) - self.handle_x_translate,0,0)))
 
         return assembly.rotate((0,0,1),(0,0,0), -30)
+    
+    def build_assembly(self)->cq.Assembly:
+        scene = self.build()
+
+        assembly = cq.Assembly()
+        assembly.add(scene,color=cq.Color(1,0,0), name="door_hexagon")
+        return assembly

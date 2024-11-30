@@ -55,6 +55,7 @@ class Dome(Base):
         self.greebles_bp = []
 
         # render flags
+        self.render_frame:bool = True
         self.render_greebles:bool = True
 
         #--- shapes
@@ -93,14 +94,17 @@ class Dome(Base):
 
     def build(self)->cq.Workplane:
         super().build()
-        dome = self.build_frame()
+        
+        if self.render_frame:
+            dome = self.build_frame()
+        else:
+            dome = cq.Workplane("XY")
         greebled_r1 = None
         greebled_r2 = None
 
         #greebles
 
         ## center greeble
-        #print(self.greebles_bp)
         if self.render_greebles:
             if self.greebles_bp and len(self.greebles_bp) > 0:
 
@@ -235,7 +239,6 @@ class Dome(Base):
                         )
                 except IndexError:
                     print("Index doesn't exist!")
-                    raise Exception('Something went awry')
         return dome
 
 
@@ -295,7 +298,6 @@ class Dome(Base):
                         )
                 except IndexError:
                     print("Index doesn't exist!")
-                    raise Exception('Something went awry')
 
         if pen_list:
             for i in range(5):
@@ -314,7 +316,6 @@ class Dome(Base):
                         )
                 except IndexError:
                     print("Index doesn't exist!")
-                    raise Exception('Something went awry')
 
         return ring
 

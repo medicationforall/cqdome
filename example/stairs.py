@@ -12,4 +12,4 @@ bp_stairs.make(bp_dome)
 example_stairs = bp_stairs.build()
 
 #show_object(example_stairs)
-cq.exporters.export(example_stairs,'stl/stairs.stl')
+cq.exporters.export(example_stairs,'stl/dome_stairs.stl')

@@ -3,10 +3,16 @@
 ## Main wip
 
 ## 1.0.0
+* Upped cqterrain version to 2.0.2
 * Added type annotations
-* Upped cqterrain version to 1.0.0
-* Added example_runner.py
 * Updated README.md
+* WindowFrame added render_pane boolean parameter
+* Dome added render_frame boolean parameter
+* Added cover image
+* Added documentation
+* Added examples
+* Added dome example
+* Added example_runner.py
 
 ## 0.1.0
 * Upped cqterrain version to 0.3.0

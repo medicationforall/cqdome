@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import cadquery as cq
-from .. import Dome
 from . import make_angled_steps
 from cadqueryhelper import Base
 
@@ -56,3 +55,10 @@ class Stairs(Base):
                 scene = scene.cut(dome)
 
         return scene
+    
+    def build_assembly(self)->cq.Assembly:
+        scene = self.build()
+
+        assembly = cq.Assembly()
+        assembly.add(scene,color=cq.Color(1,0,0), name="stairs")
+        return assembly

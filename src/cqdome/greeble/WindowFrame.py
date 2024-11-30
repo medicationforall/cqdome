@@ -41,6 +41,8 @@ class WindowFrame(Base):
         self.pane_rail_translate:float = 0 
         self.frame_size:float = 5
 
+        self.render_pane:bool = False
+
         self.outline:cq.Workplane|None = None
         self.pane_rail:cq.Workplane|None = None
         self.frame:cq.Workplane|None = None
@@ -124,4 +126,24 @@ class WindowFrame(Base):
         if self.pane_rail:
             window = window.cut(self.pane_rail)
 
+            if self.render_pane:
+                 window = window.add(self.pane_rail)
         return window
+    
+    def build_assembly(self)->cq.Assembly:
+        assembly = cq.Assembly()
+
+        window = cq.Workplane("XY")
+
+        if self.frame:
+            window = window.union(self.frame)
+
+        if self.pane_rail:
+            window = window.cut(self.pane_rail)
+
+        assembly.add(window,color=cq.Color(1, 0, 0), name="window_frame")
+
+        if self.render_pane:
+            assembly.add(self.pane_rail ,color=cq.Color(0, 1, 0), name="window_pane_rail")
+
+        return assembly

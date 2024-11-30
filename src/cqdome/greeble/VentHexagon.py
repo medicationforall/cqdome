@@ -69,7 +69,7 @@ class VentHexagon(BaseHexagon):
         self.__make_vents()
 
 
-    def build(self):
+    def build(self)->cq.Workplane:
         super().build()
         scene = cq.Workplane("XY")
 
@@ -83,3 +83,10 @@ class VentHexagon(BaseHexagon):
             scene = scene.union(self.vents.intersect(self.hexagon_cut))
 
         return scene
+    
+    def build_assembly(self)->cq.Assembly:
+        scene = self.build()
+
+        assembly = cq.Assembly()
+        assembly.add(scene,color=cq.Color(1,0,0), name="vent")
+        return assembly
