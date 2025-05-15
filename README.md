@@ -1,6 +1,13 @@
 # cqdome
 Python Library for making a truncated icosahedron dome terrain written in [cadquery](https://cadquery.readthedocs.io/en/latest/intro.html). <br />The dome consists of an open frame and parts that can be attached.
 
+---
+
+## ARCHIVE
+This repo is an archive, active development has been moved to [cqindustry](https://github.com/medicationforall/cqindustry)
+
+---
+
 [![](./documentation/image/dome/cover.png)](./example/dome.py)<br /><br />
 
 ### Example Usage
